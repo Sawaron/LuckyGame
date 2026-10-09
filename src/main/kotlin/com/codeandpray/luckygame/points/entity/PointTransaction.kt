@@ -20,7 +20,6 @@ class PointTransaction(
     @field:Column(nullable = false, updatable = false)
     val type: PointTransactionType,
 
-    // Изменение баланса со знаком: ставка отрицательная, начисления положительные.
     @field:Column(nullable = false, updatable = false)
     val amount: Long,
 
