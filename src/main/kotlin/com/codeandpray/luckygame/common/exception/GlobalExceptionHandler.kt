@@ -8,8 +8,10 @@ import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.ErrorResponse
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -17,13 +19,11 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import java.time.Instant
 
-// Перехватывает исключения из всех контроллеров и превращает их в ответ ApiError
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
-    // Имя уникального ограничения на колонку username, которое PostgreSQL создаёт по умолчанию
     private val usernameConstraint = "users_username_key"
 
     // Пользователь не найден: 404
@@ -55,7 +55,7 @@ class GlobalExceptionHandler {
     ): ResponseEntity<ApiError> =
         buildError(HttpStatus.BAD_REQUEST, "INVALID_GAME_REQUEST", ex.message.orEmpty(), request)
 
-    // Не прошла проверка @Valid у тела запроса: 400, ошибки по полям попадают в fieldErrors
+    // Не прошла проверка @Valid у тела запроса: 400
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(ex: MethodArgumentNotValidException, request: HttpServletRequest): ResponseEntity<ApiError> {
         val fieldErrors = ex.bindingResult.fieldErrors.associate { error ->
@@ -70,7 +70,7 @@ class GlobalExceptionHandler {
         )
     }
 
-    // Не прошла проверка параметров пути или запроса, например @Positive у userId: 400
+    // Не прошла проверка параметров пути или запроса
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleMethodValidation(
         ex: HandlerMethodValidationException,
@@ -78,7 +78,7 @@ class GlobalExceptionHandler {
     ): ResponseEntity<ApiError> =
         buildError(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Некорректные параметры запроса", request)
 
-    // Тело запроса не читается: битый JSON или неверный тип поля: 400
+    // Тело запроса не читается
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handleUnreadableRequest(
         ex: HttpMessageNotReadableException,
@@ -86,7 +86,7 @@ class GlobalExceptionHandler {
     ): ResponseEntity<ApiError> =
         buildError(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST", "Некорректный формат запроса", request)
 
-    // Параметр пути или запроса не приводится к нужному типу, например userId=abc: 400
+    // Параметр пути или запроса не приводится к нужному типу
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleTypeMismatch(
         ex: MethodArgumentTypeMismatchException,
@@ -99,7 +99,7 @@ class GlobalExceptionHandler {
             request
         )
 
-    // Нарушение ограничений базы: 409 только для занятого имени, остальные нарушения — 500
+    // Нарушение ограничений базы
     @ExceptionHandler(DataIntegrityViolationException::class)
     fun handleDataIntegrityViolation(
         ex: DataIntegrityViolationException,
@@ -118,16 +118,25 @@ class GlobalExceptionHandler {
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", INTERNAL_MESSAGE, request)
     }
 
-    // Все остальные непредвиденные ошибки: 500, детали пишутся только в журнал
+    // Ошибки самого Spring
+    // Все остальные непредвиденные ошибки: 500
     @ExceptionHandler(Exception::class)
     fun handleUnexpected(ex: Exception, request: HttpServletRequest): ResponseEntity<ApiError> {
+        if (ex is ErrorResponse) {
+            val message = when (ex.statusCode.value()) {
+                404 -> "Ресурс не найден"
+                405 -> "Метод запроса не поддерживается"
+                else -> "Некорректный запрос"
+            }
+            return buildError(ex.statusCode, "HTTP_ERROR", message, request)
+        }
         logger.error("Непредвиденная ошибка для ${request.requestURI}", ex)
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", INTERNAL_MESSAGE, request)
     }
 
-    // Собирает ответ с нужным статусом и телом ApiError
+
     private fun buildError(
-        status: HttpStatus,
+        status: HttpStatusCode,
         code: String,
         message: String,
         request: HttpServletRequest,
@@ -144,7 +153,7 @@ class GlobalExceptionHandler {
     }
 
     private companion object {
-        // Общее сообщение для клиента, без внутренних деталей
+
         const val INTERNAL_MESSAGE = "Внутренняя ошибка сервера"
     }
 }
