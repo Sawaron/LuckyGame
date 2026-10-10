@@ -21,7 +21,6 @@ class PointService(
 ) {
 
 
-    //	Увеличить баланс и записать INITIAL_GRANT без раунда
     @Transactional
     fun grantInitialPoints(user: User, amount: Long): Unit {
         user.creditPoints(amount)
@@ -36,7 +35,6 @@ class PointService(
         userRepository.save(user)
     }
 
-    //	Принять положительную сумму, списать её и записать отрицательный BET
     @Transactional(propagation = Propagation.MANDATORY)
     fun debitBet(user: User, roundId: Long, amount: Long): Unit {
 
@@ -53,7 +51,6 @@ class PointService(
         userRepository.save(user)
     }
 
-    //	Принять положительную сумму, начислить её и записать PAYOUT
     @Transactional(propagation = Propagation.MANDATORY)
     fun creditPayout(user: User, roundId: Long, amount: Long): Unit {
 
