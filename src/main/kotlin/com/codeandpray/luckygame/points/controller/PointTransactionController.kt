@@ -2,7 +2,7 @@ package com.codeandpray.luckygame.points.controller
 
 import com.codeandpray.luckygame.common.dto.PageResponse
 import com.codeandpray.luckygame.points.service.PointService
-import com.codeandpray.luckygame.user.dto.PointTransactionResponse
+import com.codeandpray.luckygame.points.dto.PointTransactionResponse
 import jakarta.validation.constraints.Positive
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
