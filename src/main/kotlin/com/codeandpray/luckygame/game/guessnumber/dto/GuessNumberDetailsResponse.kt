@@ -6,6 +6,6 @@ data class GuessNumberDetailsResponse (
     val guessedNumber: Int,
     val drawnNumber: Int,
     val minNumber: Int,
-    val macNumber: Int,
+    val maxNumber: Int,
     val payoutMultiplier: BigDecimal
 )

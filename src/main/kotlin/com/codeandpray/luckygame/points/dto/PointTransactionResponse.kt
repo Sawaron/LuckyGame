@@ -1,7 +1,7 @@
 package com.codeandpray.luckygame.user.dto
 
 import com.codeandpray.luckygame.points.entity.PointTransactionType
-import kotlin.time.Instant
+import java.time.Instant
 
 data class PointTransactionResponse (
     val id: Long,
