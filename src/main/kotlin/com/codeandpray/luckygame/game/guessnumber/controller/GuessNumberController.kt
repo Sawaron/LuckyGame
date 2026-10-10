@@ -11,17 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-// Контроллер игры «угадай число»: передаёт запросы в GuessNumberService
 @RestController
 @RequestMapping("/games/guess-number")
 class GuessNumberController(private val guessNumberService: GuessNumberService) {
 
-    // GET /games/guess-number/rules: возвращает серверные правила игры и шанс выигрыша
     @GetMapping("/rules")
     fun getRules(): GuessNumberRulesResponse =
         guessNumberService.getRules()
 
-    // POST /games/guess-number/play: играет один раунд и возвращает результат с итоговым балансом
     @PostMapping("/play")
     fun play(@Valid @RequestBody request: PlayGuessNumberRequest): PlayGuessNumberResponse =
         guessNumberService.play(request)
