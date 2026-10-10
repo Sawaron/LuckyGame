@@ -5,7 +5,7 @@ import com.codeandpray.luckygame.user.dto.UserRequest
 import com.codeandpray.luckygame.user.dto.UserResponse
 import com.codeandpray.luckygame.user.entity.User
 import com.codeandpray.luckygame.user.exception.UserNotFoundException
-import com.codeandpray.luckygame.user.exception.UsernameAlreadyExists
+import com.codeandpray.luckygame.user.exception.UsernameAlreadyExistsException
 import com.codeandpray.luckygame.user.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
@@ -20,7 +20,7 @@ class UserService(
     @Transactional
     fun create(request: UserRequest): UserResponse {
         if (userRepository.existsByUsername(request.username)) {
-            throw UsernameAlreadyExists(request.username)
+            throw UsernameAlreadyExistsException(request.username)
         }
         val user = User(request.username)
 
