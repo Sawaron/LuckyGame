@@ -3,7 +3,7 @@ package com.codeandpray.luckygame.game.guessnumber.service
 import com.codeandpray.luckygame.game.entity.GameRound
 import com.codeandpray.luckygame.game.entity.GameType
 import com.codeandpray.luckygame.game.entity.RoundOutcome
-import com.codeandpray.luckygame.game.guessnumber.dto.GuessNumberDetailsResponse
+import com.codeandpray.luckygame.game.exception.InvalidGameRequestException
 import com.codeandpray.luckygame.game.guessnumber.dto.GuessNumberRulesResponse
 import com.codeandpray.luckygame.game.guessnumber.dto.PlayGuessNumberRequest
 import com.codeandpray.luckygame.game.guessnumber.dto.PlayGuessNumberResponse
@@ -43,6 +43,17 @@ class GuessNumberService(
 
     @Transactional
     fun play(request: PlayGuessNumberRequest): PlayGuessNumberResponse {
+        if (request.guessedNumber !in guessNumberRules.minNumber..guessNumberRules.maxNumber) {
+            throw InvalidGameRequestException(
+                "Выбранное число должно быть от ${guessNumberRules.minNumber} до ${guessNumberRules.maxNumber}"
+            )
+        }
+        if (request.bet !in guessNumberRules.minBet..guessNumberRules.maxBet) {
+            throw InvalidGameRequestException(
+                "Ставка должна быть от ${guessNumberRules.minBet} до ${guessNumberRules.maxBet} поинтов"
+            )
+        }
+
         val user = userRepository.findByIdForUpdate(request.userId)
             ?: throw UserNotFoundException(request.userId)
 

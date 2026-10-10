@@ -1,4 +1,4 @@
-package com.codeandpray.luckygame.user.dto
+package com.codeandpray.luckygame.points.dto
 
 import com.codeandpray.luckygame.points.entity.PointTransactionType
 import java.time.Instant
