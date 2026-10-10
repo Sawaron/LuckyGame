@@ -3,7 +3,7 @@ package com.codeandpray.luckygame.game.dto
 import com.codeandpray.luckygame.game.entity.GameType
 import com.codeandpray.luckygame.game.entity.RoundOutcome
 import com.codeandpray.luckygame.game.guessnumber.dto.GuessNumberDetailsResponse
-import kotlin.time.Instant
+import java.time.Instant
 
 data class GameRoundResponse (
     val id: Long,
