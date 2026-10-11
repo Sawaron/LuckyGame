@@ -4,7 +4,7 @@ import com.codeandpray.luckygame.common.dto.PageResponse
 import com.codeandpray.luckygame.points.entity.PointTransaction
 import com.codeandpray.luckygame.points.entity.PointTransactionType
 import com.codeandpray.luckygame.points.repository.PointTransactionRepository
-import com.codeandpray.luckygame.user.dto.PointTransactionResponse
+import com.codeandpray.luckygame.points.dto.PointTransactionResponse
 import com.codeandpray.luckygame.user.entity.User
 import com.codeandpray.luckygame.user.exception.UserNotFoundException
 import com.codeandpray.luckygame.user.repository.UserRepository
